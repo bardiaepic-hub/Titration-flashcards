@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>BTEC Unit 5 ✨</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff0f4; min-height: 100vh; color: #3a1a25; }
+
+  .header { text-align: center; padding: 1.5rem 1rem 0.25rem; position: relative; }
+  .header-hearts { font-size: 18px; letter-spacing: 4px; margin-bottom: 0.25rem; }
+  h1 { font-size: 22px; font-weight: 700; color: #c0345a; }
+  .subtitle { font-size: 12px; color: #e8a0b4; margin-top: 2px; margin-bottom: 0.5rem; }
+
+  .floating-hearts { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 0; }
+  .fh { position: absolute; font-size: 16px; opacity: 0.12; animation: floatUp linear infinite; }
+
+  @keyframes floatUp {
+    0% { transform: translateY(100vh) rotate(0deg); opacity: 0.15; }
+    100% { transform: translateY(-120px) rotate(20deg); opacity: 0; }
+  }
+
+  .subject-tabs { display: flex; justify-content: center; gap: 8px; padding: 0.75rem 1rem; flex-wrap: wrap; position: relative; z-index: 1; }
+  .sub-tab { padding: 8px 16px; border-radius: 20px; border: 1.5px solid #f5c0d0; background: white; font-size: 13px; font-weight: 600; cursor: pointer; color: #c0345a; transition: all 0.2s; }
+  .sub-tab.active { background: #f7c5d5; border-color: #e07090; color: #a0204a; }
+
+  .topic-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; padding: 0 1rem 0.75rem; position: relative; z-index: 1; }
+  .topic-btn { padding: 5px 12px; border-radius: 16px; border: 1px solid #f5c0d0; background: white; color: #c0607a; font-size: 12px; cursor: pointer; }
+  .topic-btn.active { background: #fce4ec; color: #c0345a; border-color: #e07090; }
+
+  .main { display: flex; flex-direction: column; align-items: center; padding: 0 1rem; position: relative; z-index: 1; }
+  .progress { font-size: 13px; color: #d08090; text-align: center; margin-bottom: 0.3rem; }
+  .hint { font-size: 12px; color: #e8b0c0; text-align: center; margin-bottom: 1rem; }
+
+  .card-scene { perspective: 1000px; width: 100%; max-width: 480px; height: 250px; cursor: pointer; user-select: none; }
+  .card-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.45s ease; }
+  .card-inner.flipped { transform: rotateY(180deg); }
+  .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; border: 1.5px solid #f5c0d0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem 1.25rem; text-align: center; background: white; box-shadow: 0 4px 20px rgba(200,80,120,0.1); }
+  .card-back { transform: rotateY(180deg); background: #fff5f8; }
+  .card-deco { font-size: 20px; margin-bottom: 0.5rem; }
+  .q-label { font-size: 10px; font-weight: 700; color: #e8a0b4; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.6rem; }
+  .q-text { font-size: 16px; font-weight: 600; line-height: 1.4; color: #3a1a25; }
+  .a-text { font-size: 14px; line-height: 1.65; color: #3a1a25; }
+
+  .know-btns { display: flex; gap: 8px; width: 100%; max-width: 480px; margin-top: 0.75rem; }
+  .know-btn { flex: 1; padding: 10px; border-radius: 12px; border: 1.5px solid; font-size: 13px; font-weight: 600; cursor: pointer; background: white; }
+  .know-btn.yes { border-color: #a8d8a8; color: #2e7d32; }
+  .know-btn.yes:active { background: #e8f5e9; }
+  .know-btn.no { border-color: #f5a0b5; color: #c0345a; }
+  .know-btn.no:active { background: #fce4ec; }
+
+  .controls { display: flex; align-items: center; gap: 8px; margin-top: 0.75rem; width: 100%; max-width: 480px; padding-bottom: 2.5rem; }
+  .btn { flex: 1; padding: 13px; border-radius: 14px; border: 1.5px solid #f5c0d0; background: white; color: #c0345a; font-size: 15px; font-weight: 500; cursor: pointer; }
+  .btn:active { background: #fce4ec; transform: scale(0.97); }
+  .btn:disabled { opacity: 0.3; }
+  .shuffle-btn { background: linear-gradient(135deg, #f48fb1, #e91e8c); color: white; border-color: transparent; font-weight: 700; }
+  .shuffle-btn:active { opacity: 0.85; }
+
+  .score-pill { background: white; border: 1.5px solid #f5c0d0; border-radius: 20px; padding: 5px 14px; font-size: 12px; color: #c0607a; margin-bottom: 0.5rem; }
+
+  .done-screen { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem 1rem; }
+  .done-screen.show { display: flex; }
+  .done-emoji { font-size: 48px; margin-bottom: 1rem; }
+  .done-title { font-size: 20px; font-weight: 700; color: #c0345a; margin-bottom: 0.5rem; }
+  .done-sub { font-size: 14px; color: #d08090; margin-bottom: 1.5rem; }
+  .done-btn { padding: 12px 28px; border-radius: 20px; background: linear-gradient(135deg, #f48fb1, #e91e8c); color: white; font-size: 15px; font-weight: 700; border: none; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="floating-hearts" id="hearts"></div>
+
+<div class="header">
+  <div class="header-hearts">💕 💗 💕</div>
+  <h1>BTEC Unit 5 ✨</h1>
+  <p class="subtitle">Applied Science Level 3 · good luck babe</p>
+</div>
+
+<div class="subject-tabs">
+  <button class="sub-tab active" onclick="setSubject('chem')">🧪 Chemistry</button>
+  <button class="sub-tab" onclick="setSubject('bio')">🫀 Biology</button>
+  <button class="sub-tab" onclick="setSubject('phys')">⚡ Physics</button>
+</div>
+
+<div class="topic-row" id="topicRow"></div>
+
+<div class="main" id="mainArea">
+  <div class="score-pill" id="scorePill">💗 0 known so far</div>
+  <div class="progress" id="progress"></div>
+  <div class="hint" id="hint">Tap card to flip 💕</div>
+  <div class="card-scene" onclick="flipCard()">
+    <div class="card-inner" id="cardInner">
+      <div class="card-face">
+        <div class="card-deco">🌸</div>
+        <div class="q-label">Question</div>
+        <div class="q-text" id="qText"></div>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-deco">💡</div>
+        <div class="q-label">Answer</div>
+        <div class="a-text" id="aText"></div>
+      </div>
+    </div>
+  </div>
+  <div class="know-btns" id="knowBtns" style="display:none;">
+    <button class="know-btn no" onclick="markCard(false)">✗ Still learning</button>
+    <button class="know-btn yes" onclick="markCard(true)">✓ Got it!</button>
+  </div>
+  <div class="controls">
+    <button class="btn" id="prevBtn" onclick="navigate(-1)">← Prev</button>
+    <button class="btn shuffle-btn" onclick="shuffle()">✨ Shuffle</button>
+    <button class="btn" id="nextBtn" onclick="navigate(1)">Next →</button>
+  </div>
+</div>
+
+<div class="done-screen" id="doneScreen">
+  <div class="done-emoji">🎉💕</div>
+  <div class="done-title">You finished the deck!</div>
+  <div class="done-sub" id="doneScore"></div>
+  <button class="done-btn" onclick="resetDeck()">Go again ✨</button>
+</div>
+
+<script>
+const data = {
+  chem: [
+    {topic:"Titration", q:"What is a burette used for?", a:"Holds the titrant and delivers precise, measurable volumes. Read to the nearest 0.05 cm³."},
+    {topic:"Titration", q:"Why rinse the burette with the titrant before use?", a:"Rinsing with water dilutes the titrant and gives inaccurate results."},
+    {topic:"Titration", q:"What are concordant results?", a:"Titre values within 0.10 cm³ of each other. Need at least two for a reliable mean."},
+    {topic:"Titration", q:"Difference between end point and equivalence point?", a:"Equivalence point = moles of acid equals moles of base (theoretical). End point = the observed colour change."},
+    {topic:"Titration", q:"Formula linking moles, concentration and volume?", a:"Moles = Concentration (mol/dm³) × Volume (dm³). Divide cm³ by 1000 to get dm³."},
+    {topic:"Titration", q:"Colour change for phenolphthalein at the endpoint?", a:"Colourless → pink. One drop of excess alkali causes the change."},
+    {topic:"Titration", q:"Colour change for methyl orange at the endpoint?", a:"Red (in acid) → orange/yellow (in alkali). Look for the first permanent orange colour."},
+    {topic:"Titration", q:"Why is KMnO₄ self-indicating?", a:"It's intensely purple and gets decolourised by the reducing agent. Endpoint = first permanent pink tinge."},
+    {topic:"Titration", q:"How do you calculate % error for a burette?", a:"% error = (uncertainty ÷ measurement) × 100. Burette uncertainty = ±0.10 cm³ per titre."},
+    {topic:"Titration", q:"Why is the rough titre excluded from the mean?", a:"It's done quickly and may overshoot the endpoint, making it less accurate."},
+    {topic:"Bonding", q:"What is ionic bonding?", a:"Electrostatic attraction between oppositely charged ions, formed by electron transfer from a metal to a non-metal."},
+    {topic:"Bonding", q:"What is metallic bonding?", a:"Positive metal ions in a lattice surrounded by delocalised electrons. Explains conductivity and malleability."},
+    {topic:"Bonding", q:"Why do ionic compounds have high melting points?", a:"Strong electrostatic forces between ions require a lot of energy to break."},
+    {topic:"Bonding", q:"Why can metals conduct electricity?", a:"Delocalised electrons are free to move and carry charge through the lattice."},
+    {topic:"Substances", q:"What is the Contact Process?", a:"Manufactures sulfuric acid. SO₂ is oxidised to SO₃ using vanadium(V) oxide catalyst."},
+    {topic:"Substances", q:"What is cracking?", a:"Breaking large hydrocarbons into smaller, more useful alkanes and alkenes using heat and a catalyst."},
+    {topic:"Substances", q:"What are geometric isomers?", a:"Same molecular formula but different spatial arrangements around a C=C double bond (cis/trans)."},
+    {topic:"Substances", q:"What is aluminium oxide used for?", a:"Raw material in aluminium extraction by electrolysis. It is also amphoteric (reacts with both acids and bases)."},
+    {topic:"Enthalpy", q:"What is an exothermic reaction?", a:"Releases energy to surroundings. ΔH is negative. Example: combustion."},
+    {topic:"Enthalpy", q:"What is an endothermic reaction?", a:"Absorbs energy from surroundings. ΔH is positive. Example: thermal decomposition."},
+    {topic:"Enthalpy", q:"What is activation energy?", a:"Minimum energy required for a reaction to start. A catalyst lowers this by providing an alternative pathway."},
+    {topic:"Enthalpy", q:"Formula for heat energy in a calorimetry experiment?", a:"q = mcΔT. m = mass (g), c = 4.18 J/g°C for water, ΔT = temperature change."},
+  ],
+  bio: [
+    {topic:"The Heart", q:"What are the four chambers of the heart?", a:"Right atrium, right ventricle, left atrium, left ventricle. Right pumps to lungs; left pumps to body."},
+    {topic:"The Heart", q:"What do atrioventricular valves do?", a:"Prevent backflow from ventricles to atria. Includes the mitral (bicuspid) and tricuspid valves."},
+    {topic:"The Heart", q:"What do semilunar valves do?", a:"Prevent backflow from the aorta and pulmonary artery back into the ventricles after contraction."},
+    {topic:"The Heart", q:"What is the SA node?", a:"The sinoatrial node — the heart's natural pacemaker. Generates electrical impulses in the right atrium."},
+    {topic:"The Heart", q:"What is cardiac output?", a:"Cardiac output = heart rate × stroke volume. Volume of blood pumped per minute."},
+    {topic:"The Heart", q:"What is the difference between systole and diastole?", a:"Systole = ventricles contracting (pumping blood out). Diastole = ventricles relaxing (filling with blood)."},
+    {topic:"The Heart", q:"What does the aorta do?", a:"Carries oxygenated blood from the left ventricle to the rest of the body. Largest artery in the body."},
+    {topic:"The Heart", q:"What is the pulmonary circuit?", a:"Right ventricle → pulmonary artery → lungs (gas exchange) → pulmonary vein → left atrium."},
+    {topic:"Lungs", q:"What is the role of alveoli?", a:"Site of gas exchange. Large surface area, thin walls, moist lining and good blood supply maximise diffusion."},
+    {topic:"Lungs", q:"How does O₂ move from alveoli into the blood?", a:"Diffusion down a concentration gradient — high O₂ in alveoli, low O₂ in blood. Crosses thin walls."},
+    {topic:"Lungs", q:"What happens during inhalation?", a:"Diaphragm flattens, intercostals contract, thorax volume increases, pressure drops, air rushes in."},
+    {topic:"Lungs", q:"What happens during exhalation?", a:"Diaphragm and intercostals relax, thorax volume decreases, pressure rises, air is pushed out."},
+    {topic:"Lungs", q:"What is tidal volume?", a:"Volume of air inhaled or exhaled in one normal breath — approximately 500 cm³ at rest."},
+    {topic:"Lungs", q:"What is vital capacity?", a:"The maximum volume of air that can be exhaled after a maximum inhalation."},
+    {topic:"Kidneys", q:"Main functions of the kidneys?", a:"Filter blood to remove urea and excess water/salts, regulate blood pressure, maintain pH balance."},
+    {topic:"Kidneys", q:"What is ultrafiltration?", a:"Blood filtered under high pressure in the glomerulus. Small molecules pass into the Bowman's capsule."},
+    {topic:"Kidneys", q:"What is selective reabsorption?", a:"Useful substances (glucose, amino acids, water, salts) reabsorbed from filtrate back into blood in the tubules."},
+    {topic:"Kidneys", q:"What is urea and where is it made?", a:"Waste product from breakdown of excess amino acids (deamination) in the liver. Excreted by the kidneys."},
+    {topic:"Kidneys", q:"What does ADH do?", a:"Antidiuretic hormone controls water reabsorption in kidney tubules. More ADH = more water reabsorbed = concentrated urine."},
+    {topic:"Kidneys", q:"What is a nephron?", a:"The functional unit of the kidney. Each kidney has ~1 million nephrons that filter blood and produce urine."},
+  ],
+  phys: [
+    {topic:"Thermal Physics", q:"Formula for heat energy?", a:"Q = mcΔT. Q = energy (J), m = mass (kg), c = specific heat capacity, ΔT = temperature change."},
+    {topic:"Thermal Physics", q:"What is specific latent heat?", a:"Energy needed to change state of 1 kg of a substance without changing temperature. Q = mL."},
+    {topic:"Thermal Physics", q:"Difference between heat and temperature?", a:"Temperature = average kinetic energy of particles. Heat = total thermal energy transferred between objects."},
+    {topic:"Thermal Physics", q:"Three methods of heat transfer?", a:"Conduction (solids, particle vibration), convection (fluids, density currents), radiation (EM waves, no medium needed)."},
+    {topic:"Thermal Physics", q:"What happens to gas pressure when temperature increases (constant volume)?", a:"Pressure increases — particles move faster and hit walls more often and harder. P/T = constant (Gay-Lussac's Law)."},
+    {topic:"Thermal Physics", q:"State Boyle's Law.", a:"At constant temperature, P × V = constant (P₁V₁ = P₂V₂). Pressure and volume are inversely proportional."},
+    {topic:"Thermal Physics", q:"What is absolute zero?", a:"0 K (−273°C). Theoretical temperature where particles have minimum kinetic energy and gas pressure = zero."},
+    {topic:"Materials", q:"Difference between elastic and plastic deformation?", a:"Elastic: returns to original shape when force removed. Plastic: permanently deformed beyond the elastic limit."},
+    {topic:"Materials", q:"State Hooke's Law.", a:"F = kx. Force = spring constant × extension. Applies only up to the elastic limit."},
+    {topic:"Materials", q:"What is Young's Modulus?", a:"Measure of stiffness. E = stress ÷ strain. Higher value = stiffer material. Units: Pa."},
+    {topic:"Materials", q:"What is stress?", a:"Force per unit area. Stress = F ÷ A. Units: Pa (N/m²)."},
+    {topic:"Materials", q:"What is strain?", a:"Extension divided by original length. Strain = ΔL ÷ L₀. No units — it's a ratio."},
+    {topic:"Materials", q:"Difference between brittle and ductile materials?", a:"Brittle: fractures suddenly with little deformation (e.g. glass). Ductile: can be stretched into wire (e.g. copper)."},
+    {topic:"Fluids", q:"What is Bernoulli's principle?", a:"In a flowing fluid, as speed increases, pressure decreases. Explains lift on aircraft wings."},
+    {topic:"Fluids", q:"What is viscosity?", a:"Resistance to flow. High viscosity = thick, slow fluid (honey). Low viscosity = thin, fast fluid (water)."},
+    {topic:"Fluids", q:"What is a Newtonian fluid?", a:"Viscosity stays constant regardless of applied force. Examples: water, air."},
+    {topic:"Fluids", q:"What is a non-Newtonian fluid?", a:"Viscosity changes with force. Shear thickening (cornstarch) or shear thinning (ketchup)."},
+    {topic:"Fluids", q:"What is upthrust?", a:"Upward force on an object in a fluid, equal to the weight of fluid displaced (Archimedes' principle)."},
+    {topic:"Fluids", q:"What is laminar flow?", a:"Smooth, parallel layers of fluid. Occurs at low speeds. Efficient and predictable."},
+    {topic:"Fluids", q:"What is turbulent flow?", a:"Chaotic flow with eddies and vortices. Occurs at high speeds. Less efficient than laminar flow."},
+  ]
+};
+
+let currentSubject = 'chem';
+let currentTopic = 'All';
+let deck = [];
+let idx = 0;
+let isFlipped = false;
+let known = {};
+
+function getFiltered() {
+  return currentTopic === 'All' ? deck : deck.filter(c => c.topic === currentTopic);
+}
+
+function setSubject(s) {
+  currentSubject = s;
+  currentTopic = 'All';
+  deck = [...data[s]];
+  idx = 0;
+  isFlipped = false;
+  known = {};
+  document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.sub-tab')[['chem','bio','phys'].indexOf(s)].classList.add('active');
+  buildTopics();
+  document.getElementById('doneScreen').classList.remove('show');
+  document.getElementById('mainArea').style.display = 'flex';
+  render();
+}
+
+function buildTopics() {
+  const topics = ['All', ...new Set(data[currentSubject].map(c => c.topic))];
+  const row = document.getElementById('topicRow');
+  row.innerHTML = '';
+  topics.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'topic-btn' + (t === currentTopic ? ' active' : '');
+    b.textContent = t;
+    b.onclick = () => {
+      currentTopic = t;
+      idx = 0;
+      document.querySelectorAll('.topic-btn').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      render();
+    };
+    row.appendChild(b);
+  });
+}
+
+function render() {
+  const cards = getFiltered();
+  if (!cards.length) return;
+  if (idx >= cards.length) idx = cards.length - 1;
+  const c = cards[idx];
+  document.getElementById('qText').textContent = c.q;
+  document.getElementById('aText').textContent = c.a;
+  const knownCount = Object.values(known).filter(Boolean).length;
+  document.getElementById('scorePill').textContent = '💗 ' + knownCount + ' known so far';
+  document.getElementById('progress').textContent = 'Card ' + (idx+1) + ' of ' + cards.length + '  ·  ' + c.topic;
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx === cards.length - 1;
+  isFlipped = false;
+  document.getElementById('cardInner').classList.remove('flipped');
+  document.getElementById('hint').textContent = 'Tap card to flip 💕';
+  document.getElementById('knowBtns').style.display = 'none';
+}
+
+function flipCard() {
+  isFlipped = !isFlipped;
+  document.getElementById('cardInner').classList.toggle('flipped', isFlipped);
+  if (isFlipped) {
+    document.getElementById('hint').textContent = 'How did you do? 🌸';
+    document.getElementById('knowBtns').style.display = 'flex';
+  } else {
+    document.getElementById('hint').textContent = 'Tap card to flip 💕';
+    document.getElementById('knowBtns').style.display = 'none';
+  }
+}
+
+function markCard(didKnow) {
+  const cards = getFiltered();
+  known[cards[idx].q] = didKnow;
+  if (idx < cards.length - 1) {
+    idx++;
+    render();
+  } else {
+    showDone();
+  }
+}
+
+function showDone() {
+  const cards = getFiltered();
+  const knownCount = cards.filter(c => known[c.q] === true).length;
+  document.getElementById('doneScreen').classList.add('show');
+  document.getElementById('mainArea').style.display = 'none';
+  document.getElementById('doneScore').textContent = 'You knew ' + knownCount + ' out of ' + cards.length + ' cards 💕';
+}
+
+function resetDeck() {
+  known = {};
+  idx = 0;
+  deck = [...data[currentSubject]];
+  document.getElementById('doneScreen').classList.remove('show');
+  document.getElementById('mainArea').style.display = 'flex';
+  render();
+}
+
+function navigate(dir) {
+  const cards = getFiltered();
+  idx = Math.max(0, Math.min(cards.length - 1, idx + dir));
+  render();
+}
+
+function shuffle() {
+  deck.sort(() => Math.random() - 0.5);
+  idx = 0;
+  render();
+}
+
+function spawnHearts() {
+  const container = document.getElementById('hearts');
+  const hearts = ['💕','💗','💖','🌸','✨','💓'];
+  for (let i = 0; i < 12; i++) {
+    const h = document.createElement('div');
+    h.className = 'fh';
+    h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+    h.style.left = Math.random() * 100 + '%';
+    h.style.animationDuration = (8 + Math.random() * 10) + 's';
+    h.style.animationDelay = (Math.random() * 10) + 's';
+    h.style.fontSize = (12 + Math.random() * 10) + 'px';
+    container.appendChild(h);
+  }
+}
+
+spawnHearts();
+setSubject('chem');
+</script>
+</body>
+</html>
