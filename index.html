@@ -760,16 +760,19 @@
       b.classList.toggle('active', b.dataset.type === t);
     });
     const isMonthly = t === 'monthly';
-    $('dateField').style.display = isMonthly ? 'none' : '';
-    $('startField').style.display = isMonthly ? '' : 'none';
-    $('endField').style.display = isMonthly ? '' : 'none';
+    $('dateField').style.display = isMonthly ? 'none' : 'flex';
+    $('startField').style.display = isMonthly ? 'flex' : 'none';
+    $('endField').style.display = isMonthly ? 'flex' : 'none';
     $('f-date').required = !isMonthly;
     $('f-start').required = isMonthly;
     $('revLabel').textContent = isMonthly ? 'Revenue / month' : 'Revenue';
     $('expLabel').textContent = isMonthly ? 'Expenses / month' : 'Expenses';
   }
   document.querySelectorAll('.type-toggle button').forEach(b => {
-    b.addEventListener('click', () => setType(b.dataset.type));
+    b.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      setType(b.dataset.type);
+    });
   });
 
   $('clearForm').addEventListener('click', () => {
