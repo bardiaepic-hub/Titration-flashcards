@@ -289,6 +289,49 @@
   .entries .net.neg { color: var(--bad); font-weight: 600; }
   .entries .client { color: var(--muted); }
   .entries .actions-cell { text-align: right; white-space: nowrap; }
+  .entries .badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: #f0f0ee;
+    color: var(--muted);
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .entries .badge.recurring { background: #eef2ff; color: #4338ca; }
+
+  .type-toggle {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 3px;
+    background: var(--bg);
+  }
+  .type-toggle button {
+    flex: 1;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--muted);
+    font-family: inherit;
+    transition: all 0.15s;
+  }
+  .type-toggle button.active {
+    background: var(--fg);
+    color: white;
+  }
+  .recurring-fields { display: none; grid-column: span 12; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+  .recurring-fields.show { display: grid; }
+  .oneoff-fields { display: contents; }
+  .oneoff-fields.hide { display: none; }
 
   .empty {
     text-align: center;
@@ -377,11 +420,26 @@
 
     <div class="card">
       <form class="entry" id="entryForm" autocomplete="off">
-        <div class="field col-3">
-          <label for="f-date">Date</label>
-          <input type="date" id="f-date" required>
+        <div class="field col-4">
+          <label>Type</label>
+          <div class="type-toggle" role="tablist">
+            <button type="button" data-type="oneoff" class="active">One-off</button>
+            <button type="button" data-type="monthly">Monthly</button>
+          </div>
         </div>
-        <div class="field col-3">
+        <div class="field col-4" id="dateField">
+          <label for="f-date">Date</label>
+          <input type="date" id="f-date">
+        </div>
+        <div class="field col-2 monthly-only" id="startField" style="display:none;">
+          <label for="f-start">Starts</label>
+          <input type="month" id="f-start">
+        </div>
+        <div class="field col-2 monthly-only" id="endField" style="display:none;">
+          <label for="f-end">Ends <span style="text-transform:none;font-weight:400;color:var(--muted)">(opt.)</span></label>
+          <input type="month" id="f-end">
+        </div>
+        <div class="field col-4">
           <label for="f-service">Service</label>
           <select id="f-service" required>
             <option value="VAULT">VAULT — Web</option>
@@ -397,18 +455,18 @@
           <input type="text" id="f-client" placeholder="e.g. Acme Ltd — landing page" required>
         </div>
         <div class="field col-3">
-          <label for="f-revenue">Revenue</label>
+          <label for="f-revenue"><span id="revLabel">Revenue</span></label>
           <div class="currency-wrap">
             <input type="number" id="f-revenue" min="0" step="0.01" placeholder="0.00" required>
           </div>
         </div>
         <div class="field col-3">
-          <label for="f-expenses">Expenses</label>
+          <label for="f-expenses"><span id="expLabel">Expenses</span></label>
           <div class="currency-wrap">
             <input type="number" id="f-expenses" min="0" step="0.01" placeholder="0.00" value="0">
           </div>
         </div>
-        <div class="field col-6">
+        <div class="field col-12">
           <label for="f-notes">Notes <span style="text-transform:none;font-weight:400;color:var(--muted)">(optional)</span></label>
           <input type="text" id="f-notes" placeholder="Invoice ref, deliverables, etc.">
         </div>
@@ -470,6 +528,7 @@
 <script>
 (function() {
   const STORAGE_KEY = 'mfg.tracker.entries.v1';
+  const LEGACY_KEYS = [];
   const SERVICE_META = {
     VAULT:  { name: 'VAULT',  color: '#2563eb', desc: 'Web' },
     REACH:  { name: 'REACH',  color: '#db2777', desc: 'Social' },
@@ -481,6 +540,7 @@
 
   let entries = load();
   let cursor = startOfMonth(new Date());
+  let entryType = 'oneoff';
 
   const $ = (id) => document.getElementById(id);
 
@@ -489,7 +549,8 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return [];
       const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) ? parsed : [];
+      if (!Array.isArray(parsed)) return [];
+      return parsed.map(e => ({ type: e.type || 'oneoff', ...e }));
     } catch (e) { return []; }
   }
   function save() {
@@ -514,12 +575,25 @@
     return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   }
 
-  function entryMonthKey(e) {
-    return e.date.slice(0, 7);
+  function entryActiveInMonth(e, d) {
+    const key = monthKey(d);
+    if (e.type === 'monthly') {
+      if (e.startMonth && key < e.startMonth) return false;
+      if (e.endMonth && key > e.endMonth) return false;
+      return true;
+    }
+    return e.date && e.date.slice(0, 7) === key;
+  }
+  function entryDisplayDate(e, d) {
+    if (e.type === 'monthly') {
+      return monthKey(d) + '-01';
+    }
+    return e.date;
   }
   function entriesForMonth(d) {
-    const key = monthKey(d);
-    return entries.filter(e => entryMonthKey(e) === key);
+    return entries
+      .filter(e => entryActiveInMonth(e, d))
+      .map(e => ({ ...e, _displayDate: entryDisplayDate(e, d) }));
   }
   function totals(list) {
     return list.reduce((acc, e) => {
@@ -532,7 +606,7 @@
 
   function render() {
     $('monthLabel').textContent = monthLabel(cursor);
-    const list = entriesForMonth(cursor).sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+    const list = entriesForMonth(cursor).sort((a, b) => b._displayDate.localeCompare(a._displayDate) || b.createdAt - a.createdAt);
     const t = totals(list);
 
     $('statRevenue').textContent = fmtMoney(t.revenue);
@@ -613,11 +687,14 @@
       const meta = SERVICE_META[e.service] || SERVICE_META.OTHER;
       const net = e.revenue - e.expenses;
       const netClass = net > 0 ? 'pos' : (net < 0 ? 'neg' : '');
-      const dateFmt = new Date(e.date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+      const dateFmt = e.type === 'monthly'
+        ? 'Monthly'
+        : new Date(e.date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+      const badge = e.type === 'monthly' ? '<span class="badge recurring">↻ MONTHLY</span>' : '';
       return `
         <tr data-id="${e.id}">
           <td>${dateFmt}</td>
-          <td><span class="service-pill"><span class="swatch" style="background:${meta.color}"></span>${meta.name}</span></td>
+          <td><span class="service-pill"><span class="swatch" style="background:${meta.color}"></span>${meta.name}</span>${badge}</td>
           <td class="client hide-sm">${escapeHtml(e.client)}${e.notes ? ' <span style="opacity:0.6">· ' + escapeHtml(e.notes) + '</span>' : ''}</td>
           <td class="num">${fmtMoney(e.revenue)}</td>
           <td class="num hide-sm">${fmtMoney(e.expenses)}</td>
@@ -636,20 +713,39 @@
     ev.preventDefault();
     const revenue = parseFloat($('f-revenue').value) || 0;
     const expenses = parseFloat($('f-expenses').value) || 0;
-    const entry = {
+    const client = $('f-client').value.trim();
+    if (!client || revenue < 0) return;
+
+    const base = {
       id: uid(),
-      date: $('f-date').value,
+      type: entryType,
       service: $('f-service').value,
-      client: $('f-client').value.trim(),
+      client,
       revenue,
       expenses,
       notes: $('f-notes').value.trim(),
       createdAt: Date.now(),
     };
-    if (!entry.date || !entry.client || revenue < 0) return;
-    entries.push(entry);
+
+    let jumpTo;
+    if (entryType === 'monthly') {
+      const startMonth = $('f-start').value;
+      const endMonth = $('f-end').value || null;
+      if (!startMonth) { alert('Please choose a start month.'); return; }
+      if (endMonth && endMonth < startMonth) { alert('End month must be after start month.'); return; }
+      base.startMonth = startMonth;
+      base.endMonth = endMonth;
+      jumpTo = new Date(startMonth + '-01T00:00:00');
+    } else {
+      const date = $('f-date').value;
+      if (!date) { alert('Please choose a date.'); return; }
+      base.date = date;
+      jumpTo = new Date(date + 'T00:00:00');
+    }
+
+    entries.push(base);
     save();
-    cursor = startOfMonth(new Date(entry.date + 'T00:00:00'));
+    cursor = startOfMonth(jumpTo);
     $('f-client').value = '';
     $('f-revenue').value = '';
     $('f-expenses').value = '0';
@@ -658,10 +754,31 @@
     $('f-client').focus();
   });
 
+  function setType(t) {
+    entryType = t;
+    document.querySelectorAll('.type-toggle button').forEach(b => {
+      b.classList.toggle('active', b.dataset.type === t);
+    });
+    const isMonthly = t === 'monthly';
+    $('dateField').style.display = isMonthly ? 'none' : '';
+    $('startField').style.display = isMonthly ? '' : 'none';
+    $('endField').style.display = isMonthly ? '' : 'none';
+    $('f-date').required = !isMonthly;
+    $('f-start').required = isMonthly;
+    $('revLabel').textContent = isMonthly ? 'Revenue / month' : 'Revenue';
+    $('expLabel').textContent = isMonthly ? 'Expenses / month' : 'Expenses';
+  }
+  document.querySelectorAll('.type-toggle button').forEach(b => {
+    b.addEventListener('click', () => setType(b.dataset.type));
+  });
+
   $('clearForm').addEventListener('click', () => {
     $('entryForm').reset();
     $('f-date').value = new Date().toISOString().slice(0, 10);
+    $('f-start').value = monthKey(new Date());
+    $('f-end').value = '';
     $('f-expenses').value = '0';
+    setType('oneoff');
   });
 
   $('entriesBody').addEventListener('click', (ev) => {
@@ -670,10 +787,32 @@
     const id = btn.getAttribute('data-del');
     const e = entries.find(x => x.id === id);
     if (!e) return;
-    if (confirm(`Delete "${e.client}" (${fmtMoney(e.revenue)})?`)) {
-      entries = entries.filter(x => x.id !== id);
+    if (e.type === 'monthly') {
+      const viewMonth = monthKey(cursor);
+      const choice = prompt(
+        `"${e.client}" is a monthly entry (${fmtMoney(e.revenue)}/mo).\n\n` +
+        `Type:\n  E = End it after ${viewMonth} (keep history)\n  D = Delete entirely (removes all months)\n  cancel = keep`,
+        'E'
+      );
+      if (!choice) return;
+      const c = choice.trim().toUpperCase();
+      if (c === 'D') {
+        entries = entries.filter(x => x.id !== id);
+      } else if (c === 'E') {
+        const prev = new Date(cursor.getFullYear(), cursor.getMonth(), 1);
+        e.endMonth = monthKey(prev);
+        if (e.endMonth < e.startMonth) {
+          entries = entries.filter(x => x.id !== id);
+        }
+      } else { return; }
       save();
       render();
+    } else {
+      if (confirm(`Delete "${e.client}" (${fmtMoney(e.revenue)})?`)) {
+        entries = entries.filter(x => x.id !== id);
+        save();
+        render();
+      }
     }
   });
 
@@ -688,18 +827,23 @@
 
   $('exportCsv').addEventListener('click', () => {
     if (entries.length === 0) { alert('No entries to export.'); return; }
-    const header = ['Date', 'Service', 'Client', 'Revenue', 'Expenses', 'Net', 'Notes'];
-    const rows = [...entries]
-      .sort((a, b) => a.date.localeCompare(b.date))
-      .map(e => [
-        e.date,
-        e.service,
-        e.client,
-        e.revenue.toFixed(2),
-        e.expenses.toFixed(2),
-        (e.revenue - e.expenses).toFixed(2),
-        e.notes || '',
-      ]);
+    const header = ['Date / Month', 'Type', 'Service', 'Client', 'Revenue', 'Expenses', 'Net', 'Notes'];
+    const rows = [];
+    entries.forEach(e => {
+      if (e.type === 'monthly') {
+        const end = e.endMonth || monthKey(new Date());
+        let m = e.startMonth;
+        while (m <= end) {
+          rows.push([m, 'monthly', e.service, e.client, e.revenue.toFixed(2), e.expenses.toFixed(2), (e.revenue - e.expenses).toFixed(2), e.notes || '']);
+          const [y, mo] = m.split('-').map(Number);
+          const next = new Date(y, mo, 1);
+          m = monthKey(next);
+        }
+      } else {
+        rows.push([e.date, 'one-off', e.service, e.client, e.revenue.toFixed(2), e.expenses.toFixed(2), (e.revenue - e.expenses).toFixed(2), e.notes || '']);
+      }
+    });
+    rows.sort((a, b) => String(a[0]).localeCompare(String(b[0])));
     const csv = [header, ...rows]
       .map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))
       .join('\n');
@@ -722,6 +866,8 @@
   });
 
   $('f-date').value = new Date().toISOString().slice(0, 10);
+  $('f-start').value = monthKey(new Date());
+  setType('oneoff');
   render();
 })();
 </script>
