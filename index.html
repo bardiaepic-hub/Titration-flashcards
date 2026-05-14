@@ -2,330 +2,728 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>BTEC Unit 5 ✨</title>
+<meta name="theme-color" content="#0a0a0a">
+<title>MFG — Revenue Tracker</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #fff0f4; min-height: 100vh; color: #3a1a25; }
-
-  .header { text-align: center; padding: 1.5rem 1rem 0.25rem; position: relative; }
-  .header-hearts { font-size: 18px; letter-spacing: 4px; margin-bottom: 0.25rem; }
-  h1 { font-size: 22px; font-weight: 700; color: #c0345a; }
-  .subtitle { font-size: 12px; color: #e8a0b4; margin-top: 2px; margin-bottom: 0.5rem; }
-
-  .floating-hearts { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; z-index: 0; }
-  .fh { position: absolute; font-size: 16px; opacity: 0.12; animation: floatUp linear infinite; }
-
-  @keyframes floatUp {
-    0% { transform: translateY(100vh) rotate(0deg); opacity: 0.15; }
-    100% { transform: translateY(-120px) rotate(20deg); opacity: 0; }
+  :root {
+    --bg: #fafaf9;
+    --fg: #0a0a0a;
+    --muted: #6b6b6b;
+    --line: #e5e5e3;
+    --card: #ffffff;
+    --accent: #0a0a0a;
+    --good: #1b6b3a;
+    --bad: #b3261e;
+    --vault: #2563eb;
+    --reach: #db2777;
+    --stride: #16a34a;
+    --lens: #ea580c;
+    --craft: #7c3aed;
+    --other: #525252;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
   }
 
-  .subject-tabs { display: flex; justify-content: center; gap: 8px; padding: 0.75rem 1rem; flex-wrap: wrap; position: relative; z-index: 1; }
-  .sub-tab { padding: 8px 16px; border-radius: 20px; border: 1.5px solid #f5c0d0; background: white; font-size: 13px; font-weight: 600; cursor: pointer; color: #c0345a; transition: all 0.2s; }
-  .sub-tab.active { background: #f7c5d5; border-color: #e07090; color: #a0204a; }
+  .wrap { max-width: 920px; margin: 0 auto; padding: 32px 20px 80px; }
 
-  .topic-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; padding: 0 1rem 0.75rem; position: relative; z-index: 1; }
-  .topic-btn { padding: 5px 12px; border-radius: 16px; border: 1px solid #f5c0d0; background: white; color: #c0607a; font-size: 12px; cursor: pointer; }
-  .topic-btn.active { background: #fce4ec; color: #c0345a; border-color: #e07090; }
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 32px;
+  }
+  .brand { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+  .brand .dot { color: var(--muted); margin: 0 6px; }
+  .brand .sub { color: var(--muted); font-weight: 500; }
+  .meta { font-size: 12px; color: var(--muted); text-align: right; }
+  .meta .rating { letter-spacing: 2px; }
 
-  .main { display: flex; flex-direction: column; align-items: center; padding: 0 1rem; position: relative; z-index: 1; }
-  .progress { font-size: 13px; color: #d08090; text-align: center; margin-bottom: 0.3rem; }
-  .hint { font-size: 12px; color: #e8b0c0; text-align: center; margin-bottom: 1rem; }
+  h1 { font-size: 36px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin: 4px 0 6px; }
+  h1 .accent { color: var(--muted); font-weight: 400; }
+  .tagline { font-size: 14px; color: var(--muted); }
 
-  .card-scene { perspective: 1000px; width: 100%; max-width: 480px; height: 250px; cursor: pointer; user-select: none; }
-  .card-inner { width: 100%; height: 100%; position: relative; transform-style: preserve-3d; transition: transform 0.45s ease; }
-  .card-inner.flipped { transform: rotateY(180deg); }
-  .card-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 22px; border: 1.5px solid #f5c0d0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.5rem 1.25rem; text-align: center; background: white; box-shadow: 0 4px 20px rgba(200,80,120,0.1); }
-  .card-back { transform: rotateY(180deg); background: #fff5f8; }
-  .card-deco { font-size: 20px; margin-bottom: 0.5rem; }
-  .q-label { font-size: 10px; font-weight: 700; color: #e8a0b4; text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 0.6rem; }
-  .q-text { font-size: 16px; font-weight: 600; line-height: 1.4; color: #3a1a25; }
-  .a-text { font-size: 14px; line-height: 1.65; color: #3a1a25; }
+  section { margin-top: 48px; }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .section-num {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .section-hint { margin-left: auto; font-size: 12px; color: var(--muted); }
 
-  .know-btns { display: flex; gap: 8px; width: 100%; max-width: 480px; margin-top: 0.75rem; }
-  .know-btn { flex: 1; padding: 10px; border-radius: 12px; border: 1.5px solid; font-size: 13px; font-weight: 600; cursor: pointer; background: white; }
-  .know-btn.yes { border-color: #a8d8a8; color: #2e7d32; }
-  .know-btn.yes:active { background: #e8f5e9; }
-  .know-btn.no { border-color: #f5a0b5; color: #c0345a; }
-  .know-btn.no:active { background: #fce4ec; }
+  .summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 8px;
+  }
+  .stat {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 18px 18px 20px;
+  }
+  .stat .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .stat .value {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat .value.good { color: var(--good); }
+  .stat .value.bad { color: var(--bad); }
+  .stat .delta {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+  }
 
-  .controls { display: flex; align-items: center; gap: 8px; margin-top: 0.75rem; width: 100%; max-width: 480px; padding-bottom: 2.5rem; }
-  .btn { flex: 1; padding: 13px; border-radius: 14px; border: 1.5px solid #f5c0d0; background: white; color: #c0345a; font-size: 15px; font-weight: 500; cursor: pointer; }
-  .btn:active { background: #fce4ec; transform: scale(0.97); }
-  .btn:disabled { opacity: 0.3; }
-  .shuffle-btn { background: linear-gradient(135deg, #f48fb1, #e91e8c); color: white; border-color: transparent; font-weight: 700; }
-  .shuffle-btn:active { opacity: 0.85; }
+  .month-picker {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 4px;
+  }
+  .month-picker button {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: 6px;
+    color: var(--fg);
+    font-size: 14px;
+  }
+  .month-picker button:hover { background: #f0f0ee; }
+  .month-picker .label {
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 120px;
+    text-align: center;
+  }
 
-  .score-pill { background: white; border: 1.5px solid #f5c0d0; border-radius: 20px; padding: 5px 14px; font-size: 12px; color: #c0607a; margin-bottom: 0.5rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px;
+  }
 
-  .done-screen { display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem 1rem; }
-  .done-screen.show { display: flex; }
-  .done-emoji { font-size: 48px; margin-bottom: 1rem; }
-  .done-title { font-size: 20px; font-weight: 700; color: #c0345a; margin-bottom: 0.5rem; }
-  .done-sub { font-size: 14px; color: #d08090; margin-bottom: 1.5rem; }
-  .done-btn { padding: 12px 28px; border-radius: 20px; background: linear-gradient(135deg, #f48fb1, #e91e8c); color: white; font-size: 15px; font-weight: 700; border: none; cursor: pointer; }
+  form.entry {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 12px;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.col-3 { grid-column: span 3; }
+  .field.col-4 { grid-column: span 4; }
+  .field.col-6 { grid-column: span 6; }
+  .field.col-12 { grid-column: span 12; }
+  .field label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .field input, .field select, .field textarea {
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--fg);
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    border-color: var(--fg);
+  }
+  .field textarea { resize: vertical; min-height: 60px; }
+  .currency-wrap { position: relative; }
+  .currency-wrap::before {
+    content: '£';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--muted);
+    font-size: 14px;
+    pointer-events: none;
+  }
+  .currency-wrap input { padding-left: 24px; }
+
+  .actions { grid-column: span 12; display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
+  .btn {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    letter-spacing: 0.01em;
+  }
+  .btn-primary { background: var(--fg); color: white; }
+  .btn-primary:hover { background: #2a2a2a; }
+  .btn-ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+  .btn-ghost:hover { background: #f0f0ee; }
+  .btn-icon {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 16px;
+    padding: 4px 8px;
+    border-radius: 6px;
+  }
+  .btn-icon:hover { background: #f0f0ee; color: var(--fg); }
+  .btn-icon.danger:hover { color: var(--bad); }
+
+  .breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .br-row {
+    display: grid;
+    grid-template-columns: 110px 1fr 110px 90px;
+    align-items: center;
+    gap: 14px;
+    padding: 4px 0;
+  }
+  .br-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .br-tag .swatch {
+    width: 8px;
+    height: 8px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .br-bar {
+    height: 8px;
+    background: #f0f0ee;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .br-bar > div { height: 100%; border-radius: 4px; transition: width 0.4s; }
+  .br-amt { font-size: 13px; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+  .br-pct { font-size: 12px; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+
+  table.entries {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .entries th, .entries td {
+    padding: 12px 8px;
+    text-align: left;
+    font-size: 13px;
+    border-bottom: 1px solid var(--line);
+  }
+  .entries th {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .entries td { font-variant-numeric: tabular-nums; }
+  .entries tr:last-child td { border-bottom: 0; }
+  .entries td.num { text-align: right; }
+  .entries th.num { text-align: right; }
+  .entries .service-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .entries .service-pill .swatch {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .entries .net.pos { color: var(--good); font-weight: 600; }
+  .entries .net.neg { color: var(--bad); font-weight: 600; }
+  .entries .client { color: var(--muted); }
+  .entries .actions-cell { text-align: right; white-space: nowrap; }
+
+  .empty {
+    text-align: center;
+    padding: 36px 20px;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  footer a { color: var(--fg); text-decoration: none; border-bottom: 1px solid var(--line); }
+
+  @media (max-width: 640px) {
+    .wrap { padding: 20px 16px 60px; }
+    h1 { font-size: 26px; }
+    .summary { grid-template-columns: 1fr; }
+    .field.col-3, .field.col-4, .field.col-6 { grid-column: span 12; }
+    .br-row { grid-template-columns: 90px 1fr 80px; gap: 10px; }
+    .br-pct { display: none; }
+    .entries th.hide-sm, .entries td.hide-sm { display: none; }
+    .section-head { flex-wrap: wrap; }
+    .section-hint { margin-left: 0; width: 100%; }
+  }
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="floating-hearts" id="hearts"></div>
+  <header class="top">
+    <div>
+      <div class="brand">Moving Forward Group <span class="dot">·</span><span class="sub"> Internal</span></div>
+      <h1>Revenue Tracker <span class="accent">/ profit by service</span></h1>
+      <div class="tagline">Log income, track expenses, see monthly net by brand.</div>
+    </div>
+    <div class="meta">
+      <div class="rating">★★★★★</div>
+      <div>v1.0</div>
+    </div>
+  </header>
 
-<div class="header">
-  <div class="header-hearts">💕 💗 💕</div>
-  <h1>BTEC Unit 5 ✨</h1>
-  <p class="subtitle">Applied Science Level 3 · good luck babe</p>
-</div>
-
-<div class="subject-tabs">
-  <button class="sub-tab active" onclick="setSubject('chem')">🧪 Chemistry</button>
-  <button class="sub-tab" onclick="setSubject('bio')">🫀 Biology</button>
-  <button class="sub-tab" onclick="setSubject('phys')">⚡ Physics</button>
-</div>
-
-<div class="topic-row" id="topicRow"></div>
-
-<div class="main" id="mainArea">
-  <div class="score-pill" id="scorePill">💗 0 known so far</div>
-  <div class="progress" id="progress"></div>
-  <div class="hint" id="hint">Tap card to flip 💕</div>
-  <div class="card-scene" onclick="flipCard()">
-    <div class="card-inner" id="cardInner">
-      <div class="card-face">
-        <div class="card-deco">🌸</div>
-        <div class="q-label">Question</div>
-        <div class="q-text" id="qText"></div>
-      </div>
-      <div class="card-face card-back">
-        <div class="card-deco">💡</div>
-        <div class="q-label">Answer</div>
-        <div class="a-text" id="aText"></div>
+  <section id="overview">
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <span class="section-title">Overview</span>
+      <div class="section-hint">
+        <div class="month-picker">
+          <button id="prevMonth" aria-label="Previous month">‹</button>
+          <span class="label" id="monthLabel">—</span>
+          <button id="nextMonth" aria-label="Next month">›</button>
+        </div>
       </div>
     </div>
-  </div>
-  <div class="know-btns" id="knowBtns" style="display:none;">
-    <button class="know-btn no" onclick="markCard(false)">✗ Still learning</button>
-    <button class="know-btn yes" onclick="markCard(true)">✓ Got it!</button>
-  </div>
-  <div class="controls">
-    <button class="btn" id="prevBtn" onclick="navigate(-1)">← Prev</button>
-    <button class="btn shuffle-btn" onclick="shuffle()">✨ Shuffle</button>
-    <button class="btn" id="nextBtn" onclick="navigate(1)">Next →</button>
-  </div>
-</div>
 
-<div class="done-screen" id="doneScreen">
-  <div class="done-emoji">🎉💕</div>
-  <div class="done-title">You finished the deck!</div>
-  <div class="done-sub" id="doneScore"></div>
-  <button class="done-btn" onclick="resetDeck()">Go again ✨</button>
+    <div class="summary">
+      <div class="stat">
+        <div class="label">Revenue</div>
+        <div class="value" id="statRevenue">£0.00</div>
+        <div class="delta" id="statRevenueDelta">No entries yet</div>
+      </div>
+      <div class="stat">
+        <div class="label">Expenses</div>
+        <div class="value" id="statExpenses">£0.00</div>
+        <div class="delta" id="statExpensesDelta">—</div>
+      </div>
+      <div class="stat">
+        <div class="label">Net Profit</div>
+        <div class="value" id="statProfit">£0.00</div>
+        <div class="delta" id="statProfitDelta">—</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="add">
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <span class="section-title">Log Income</span>
+      <span class="section-hint">Quick add — saves locally</span>
+    </div>
+
+    <div class="card">
+      <form class="entry" id="entryForm" autocomplete="off">
+        <div class="field col-3">
+          <label for="f-date">Date</label>
+          <input type="date" id="f-date" required>
+        </div>
+        <div class="field col-3">
+          <label for="f-service">Service</label>
+          <select id="f-service" required>
+            <option value="VAULT">VAULT — Web</option>
+            <option value="REACH">REACH — Social</option>
+            <option value="STRIDE">STRIDE — SEO</option>
+            <option value="LENS">LENS — Photography</option>
+            <option value="CRAFT">CRAFT — Apps</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+        <div class="field col-6">
+          <label for="f-client">Client / Project</label>
+          <input type="text" id="f-client" placeholder="e.g. Acme Ltd — landing page" required>
+        </div>
+        <div class="field col-3">
+          <label for="f-revenue">Revenue</label>
+          <div class="currency-wrap">
+            <input type="number" id="f-revenue" min="0" step="0.01" placeholder="0.00" required>
+          </div>
+        </div>
+        <div class="field col-3">
+          <label for="f-expenses">Expenses</label>
+          <div class="currency-wrap">
+            <input type="number" id="f-expenses" min="0" step="0.01" placeholder="0.00" value="0">
+          </div>
+        </div>
+        <div class="field col-6">
+          <label for="f-notes">Notes <span style="text-transform:none;font-weight:400;color:var(--muted)">(optional)</span></label>
+          <input type="text" id="f-notes" placeholder="Invoice ref, deliverables, etc.">
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-ghost" id="clearForm">Clear</button>
+          <button type="submit" class="btn btn-primary">Add Entry</button>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section id="breakdown">
+    <div class="section-head">
+      <span class="section-num">03</span>
+      <span class="section-title">By Service</span>
+      <span class="section-hint" id="breakdownHint">This month</span>
+    </div>
+    <div class="card">
+      <div class="breakdown" id="breakdownList">
+        <div class="empty">Add an entry to see the breakdown.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="entries">
+    <div class="section-head">
+      <span class="section-num">04</span>
+      <span class="section-title">Entries</span>
+      <span class="section-hint">
+        <button class="btn btn-ghost" id="exportCsv" style="padding:6px 12px;font-size:12px;">Export CSV</button>
+      </span>
+    </div>
+    <div class="card" style="padding: 8px 14px;">
+      <table class="entries" id="entriesTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Service</th>
+            <th class="hide-sm">Client</th>
+            <th class="num">Revenue</th>
+            <th class="num hide-sm">Expenses</th>
+            <th class="num">Net</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="entriesBody"></tbody>
+      </table>
+      <div class="empty" id="entriesEmpty">No entries this month yet.</div>
+    </div>
+  </section>
+
+  <footer>
+    <div>Moving Forward Group · <a href="https://movingforwardgroup.co.uk" target="_blank" rel="noopener">movingforwardgroup.co.uk</a></div>
+    <div><button class="btn-icon" id="resetAll" style="font-size:12px;color:var(--muted);">Reset all data</button></div>
+  </footer>
+
 </div>
 
 <script>
-const data = {
-  chem: [
-    {topic:"Titration", q:"What is a burette used for?", a:"Holds the titrant and delivers precise, measurable volumes. Read to the nearest 0.05 cm³."},
-    {topic:"Titration", q:"Why rinse the burette with the titrant before use?", a:"Rinsing with water dilutes the titrant and gives inaccurate results."},
-    {topic:"Titration", q:"What are concordant results?", a:"Titre values within 0.10 cm³ of each other. Need at least two for a reliable mean."},
-    {topic:"Titration", q:"Difference between end point and equivalence point?", a:"Equivalence point = moles of acid equals moles of base (theoretical). End point = the observed colour change."},
-    {topic:"Titration", q:"Formula linking moles, concentration and volume?", a:"Moles = Concentration (mol/dm³) × Volume (dm³). Divide cm³ by 1000 to get dm³."},
-    {topic:"Titration", q:"Colour change for phenolphthalein at the endpoint?", a:"Colourless → pink. One drop of excess alkali causes the change."},
-    {topic:"Titration", q:"Colour change for methyl orange at the endpoint?", a:"Red (in acid) → orange/yellow (in alkali). Look for the first permanent orange colour."},
-    {topic:"Titration", q:"Why is KMnO₄ self-indicating?", a:"It's intensely purple and gets decolourised by the reducing agent. Endpoint = first permanent pink tinge."},
-    {topic:"Titration", q:"How do you calculate % error for a burette?", a:"% error = (uncertainty ÷ measurement) × 100. Burette uncertainty = ±0.10 cm³ per titre."},
-    {topic:"Titration", q:"Why is the rough titre excluded from the mean?", a:"It's done quickly and may overshoot the endpoint, making it less accurate."},
-    {topic:"Bonding", q:"What is ionic bonding?", a:"Electrostatic attraction between oppositely charged ions, formed by electron transfer from a metal to a non-metal."},
-    {topic:"Bonding", q:"What is metallic bonding?", a:"Positive metal ions in a lattice surrounded by delocalised electrons. Explains conductivity and malleability."},
-    {topic:"Bonding", q:"Why do ionic compounds have high melting points?", a:"Strong electrostatic forces between ions require a lot of energy to break."},
-    {topic:"Bonding", q:"Why can metals conduct electricity?", a:"Delocalised electrons are free to move and carry charge through the lattice."},
-    {topic:"Substances", q:"What is the Contact Process?", a:"Manufactures sulfuric acid. SO₂ is oxidised to SO₃ using vanadium(V) oxide catalyst."},
-    {topic:"Substances", q:"What is cracking?", a:"Breaking large hydrocarbons into smaller, more useful alkanes and alkenes using heat and a catalyst."},
-    {topic:"Substances", q:"What are geometric isomers?", a:"Same molecular formula but different spatial arrangements around a C=C double bond (cis/trans)."},
-    {topic:"Substances", q:"What is aluminium oxide used for?", a:"Raw material in aluminium extraction by electrolysis. It is also amphoteric (reacts with both acids and bases)."},
-    {topic:"Enthalpy", q:"What is an exothermic reaction?", a:"Releases energy to surroundings. ΔH is negative. Example: combustion."},
-    {topic:"Enthalpy", q:"What is an endothermic reaction?", a:"Absorbs energy from surroundings. ΔH is positive. Example: thermal decomposition."},
-    {topic:"Enthalpy", q:"What is activation energy?", a:"Minimum energy required for a reaction to start. A catalyst lowers this by providing an alternative pathway."},
-    {topic:"Enthalpy", q:"Formula for heat energy in a calorimetry experiment?", a:"q = mcΔT. m = mass (g), c = 4.18 J/g°C for water, ΔT = temperature change."},
-  ],
-  bio: [
-    {topic:"The Heart", q:"What are the four chambers of the heart?", a:"Right atrium, right ventricle, left atrium, left ventricle. Right pumps to lungs; left pumps to body."},
-    {topic:"The Heart", q:"What do atrioventricular valves do?", a:"Prevent backflow from ventricles to atria. Includes the mitral (bicuspid) and tricuspid valves."},
-    {topic:"The Heart", q:"What do semilunar valves do?", a:"Prevent backflow from the aorta and pulmonary artery back into the ventricles after contraction."},
-    {topic:"The Heart", q:"What is the SA node?", a:"The sinoatrial node — the heart's natural pacemaker. Generates electrical impulses in the right atrium."},
-    {topic:"The Heart", q:"What is cardiac output?", a:"Cardiac output = heart rate × stroke volume. Volume of blood pumped per minute."},
-    {topic:"The Heart", q:"What is the difference between systole and diastole?", a:"Systole = ventricles contracting (pumping blood out). Diastole = ventricles relaxing (filling with blood)."},
-    {topic:"The Heart", q:"What does the aorta do?", a:"Carries oxygenated blood from the left ventricle to the rest of the body. Largest artery in the body."},
-    {topic:"The Heart", q:"What is the pulmonary circuit?", a:"Right ventricle → pulmonary artery → lungs (gas exchange) → pulmonary vein → left atrium."},
-    {topic:"Lungs", q:"What is the role of alveoli?", a:"Site of gas exchange. Large surface area, thin walls, moist lining and good blood supply maximise diffusion."},
-    {topic:"Lungs", q:"How does O₂ move from alveoli into the blood?", a:"Diffusion down a concentration gradient — high O₂ in alveoli, low O₂ in blood. Crosses thin walls."},
-    {topic:"Lungs", q:"What happens during inhalation?", a:"Diaphragm flattens, intercostals contract, thorax volume increases, pressure drops, air rushes in."},
-    {topic:"Lungs", q:"What happens during exhalation?", a:"Diaphragm and intercostals relax, thorax volume decreases, pressure rises, air is pushed out."},
-    {topic:"Lungs", q:"What is tidal volume?", a:"Volume of air inhaled or exhaled in one normal breath — approximately 500 cm³ at rest."},
-    {topic:"Lungs", q:"What is vital capacity?", a:"The maximum volume of air that can be exhaled after a maximum inhalation."},
-    {topic:"Kidneys", q:"Main functions of the kidneys?", a:"Filter blood to remove urea and excess water/salts, regulate blood pressure, maintain pH balance."},
-    {topic:"Kidneys", q:"What is ultrafiltration?", a:"Blood filtered under high pressure in the glomerulus. Small molecules pass into the Bowman's capsule."},
-    {topic:"Kidneys", q:"What is selective reabsorption?", a:"Useful substances (glucose, amino acids, water, salts) reabsorbed from filtrate back into blood in the tubules."},
-    {topic:"Kidneys", q:"What is urea and where is it made?", a:"Waste product from breakdown of excess amino acids (deamination) in the liver. Excreted by the kidneys."},
-    {topic:"Kidneys", q:"What does ADH do?", a:"Antidiuretic hormone controls water reabsorption in kidney tubules. More ADH = more water reabsorbed = concentrated urine."},
-    {topic:"Kidneys", q:"What is a nephron?", a:"The functional unit of the kidney. Each kidney has ~1 million nephrons that filter blood and produce urine."},
-  ],
-  phys: [
-    {topic:"Thermal Physics", q:"Formula for heat energy?", a:"Q = mcΔT. Q = energy (J), m = mass (kg), c = specific heat capacity, ΔT = temperature change."},
-    {topic:"Thermal Physics", q:"What is specific latent heat?", a:"Energy needed to change state of 1 kg of a substance without changing temperature. Q = mL."},
-    {topic:"Thermal Physics", q:"Difference between heat and temperature?", a:"Temperature = average kinetic energy of particles. Heat = total thermal energy transferred between objects."},
-    {topic:"Thermal Physics", q:"Three methods of heat transfer?", a:"Conduction (solids, particle vibration), convection (fluids, density currents), radiation (EM waves, no medium needed)."},
-    {topic:"Thermal Physics", q:"What happens to gas pressure when temperature increases (constant volume)?", a:"Pressure increases — particles move faster and hit walls more often and harder. P/T = constant (Gay-Lussac's Law)."},
-    {topic:"Thermal Physics", q:"State Boyle's Law.", a:"At constant temperature, P × V = constant (P₁V₁ = P₂V₂). Pressure and volume are inversely proportional."},
-    {topic:"Thermal Physics", q:"What is absolute zero?", a:"0 K (−273°C). Theoretical temperature where particles have minimum kinetic energy and gas pressure = zero."},
-    {topic:"Materials", q:"Difference between elastic and plastic deformation?", a:"Elastic: returns to original shape when force removed. Plastic: permanently deformed beyond the elastic limit."},
-    {topic:"Materials", q:"State Hooke's Law.", a:"F = kx. Force = spring constant × extension. Applies only up to the elastic limit."},
-    {topic:"Materials", q:"What is Young's Modulus?", a:"Measure of stiffness. E = stress ÷ strain. Higher value = stiffer material. Units: Pa."},
-    {topic:"Materials", q:"What is stress?", a:"Force per unit area. Stress = F ÷ A. Units: Pa (N/m²)."},
-    {topic:"Materials", q:"What is strain?", a:"Extension divided by original length. Strain = ΔL ÷ L₀. No units — it's a ratio."},
-    {topic:"Materials", q:"Difference between brittle and ductile materials?", a:"Brittle: fractures suddenly with little deformation (e.g. glass). Ductile: can be stretched into wire (e.g. copper)."},
-    {topic:"Fluids", q:"What is Bernoulli's principle?", a:"In a flowing fluid, as speed increases, pressure decreases. Explains lift on aircraft wings."},
-    {topic:"Fluids", q:"What is viscosity?", a:"Resistance to flow. High viscosity = thick, slow fluid (honey). Low viscosity = thin, fast fluid (water)."},
-    {topic:"Fluids", q:"What is a Newtonian fluid?", a:"Viscosity stays constant regardless of applied force. Examples: water, air."},
-    {topic:"Fluids", q:"What is a non-Newtonian fluid?", a:"Viscosity changes with force. Shear thickening (cornstarch) or shear thinning (ketchup)."},
-    {topic:"Fluids", q:"What is upthrust?", a:"Upward force on an object in a fluid, equal to the weight of fluid displaced (Archimedes' principle)."},
-    {topic:"Fluids", q:"What is laminar flow?", a:"Smooth, parallel layers of fluid. Occurs at low speeds. Efficient and predictable."},
-    {topic:"Fluids", q:"What is turbulent flow?", a:"Chaotic flow with eddies and vortices. Occurs at high speeds. Less efficient than laminar flow."},
-  ]
-};
+(function() {
+  const STORAGE_KEY = 'mfg.tracker.entries.v1';
+  const SERVICE_META = {
+    VAULT:  { name: 'VAULT',  color: '#2563eb', desc: 'Web' },
+    REACH:  { name: 'REACH',  color: '#db2777', desc: 'Social' },
+    STRIDE: { name: 'STRIDE', color: '#16a34a', desc: 'SEO' },
+    LENS:   { name: 'LENS',   color: '#ea580c', desc: 'Photography' },
+    CRAFT:  { name: 'CRAFT',  color: '#7c3aed', desc: 'Apps' },
+    OTHER:  { name: 'OTHER',  color: '#525252', desc: 'Other' },
+  };
 
-let currentSubject = 'chem';
-let currentTopic = 'All';
-let deck = [];
-let idx = 0;
-let isFlipped = false;
-let known = {};
+  let entries = load();
+  let cursor = startOfMonth(new Date());
 
-function getFiltered() {
-  return currentTopic === 'All' ? deck : deck.filter(c => c.topic === currentTopic);
-}
+  const $ = (id) => document.getElementById(id);
 
-function setSubject(s) {
-  currentSubject = s;
-  currentTopic = 'All';
-  deck = [...data[s]];
-  idx = 0;
-  isFlipped = false;
-  known = {};
-  document.querySelectorAll('.sub-tab').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.sub-tab')[['chem','bio','phys'].indexOf(s)].classList.add('active');
-  buildTopics();
-  document.getElementById('doneScreen').classList.remove('show');
-  document.getElementById('mainArea').style.display = 'flex';
-  render();
-}
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [];
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) { return []; }
+  }
+  function save() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  }
 
-function buildTopics() {
-  const topics = ['All', ...new Set(data[currentSubject].map(c => c.topic))];
-  const row = document.getElementById('topicRow');
-  row.innerHTML = '';
-  topics.forEach(t => {
-    const b = document.createElement('button');
-    b.className = 'topic-btn' + (t === currentTopic ? ' active' : '');
-    b.textContent = t;
-    b.onclick = () => {
-      currentTopic = t;
-      idx = 0;
-      document.querySelectorAll('.topic-btn').forEach(x => x.classList.remove('active'));
-      b.classList.add('active');
-      render();
+  function startOfMonth(d) {
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  }
+  function monthKey(d) {
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+  }
+  function monthLabel(d) {
+    return d.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  }
+  function fmtMoney(n) {
+    const sign = n < 0 ? '-' : '';
+    const abs = Math.abs(n);
+    return sign + '£' + abs.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function uid() {
+    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  }
+
+  function entryMonthKey(e) {
+    return e.date.slice(0, 7);
+  }
+  function entriesForMonth(d) {
+    const key = monthKey(d);
+    return entries.filter(e => entryMonthKey(e) === key);
+  }
+  function totals(list) {
+    return list.reduce((acc, e) => {
+      acc.revenue += e.revenue;
+      acc.expenses += e.expenses;
+      acc.net += (e.revenue - e.expenses);
+      return acc;
+    }, { revenue: 0, expenses: 0, net: 0 });
+  }
+
+  function render() {
+    $('monthLabel').textContent = monthLabel(cursor);
+    const list = entriesForMonth(cursor).sort((a, b) => b.date.localeCompare(a.date) || b.createdAt - a.createdAt);
+    const t = totals(list);
+
+    $('statRevenue').textContent = fmtMoney(t.revenue);
+    $('statExpenses').textContent = fmtMoney(t.expenses);
+    const profitEl = $('statProfit');
+    profitEl.textContent = fmtMoney(t.net);
+    profitEl.classList.remove('good', 'bad');
+    if (t.net > 0) profitEl.classList.add('good');
+    else if (t.net < 0) profitEl.classList.add('bad');
+
+    $('statRevenueDelta').textContent = list.length === 0
+      ? 'No entries this month'
+      : list.length + ' ' + (list.length === 1 ? 'entry' : 'entries');
+
+    const prev = new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1);
+    const prevList = entriesForMonth(prev);
+    const prevT = totals(prevList);
+    if (prevT.revenue > 0) {
+      const diff = t.revenue - prevT.revenue;
+      const pct = Math.round((diff / prevT.revenue) * 100);
+      const arrow = diff >= 0 ? '▲' : '▼';
+      $('statExpensesDelta').textContent = 'Last month: ' + fmtMoney(prevT.expenses);
+      $('statProfitDelta').textContent = arrow + ' ' + (diff >= 0 ? '+' : '') + pct + '% vs last month';
+    } else {
+      $('statExpensesDelta').textContent = list.length ? 'Margin ' + (t.revenue > 0 ? Math.round((t.net / t.revenue) * 100) : 0) + '%' : '—';
+      $('statProfitDelta').textContent = t.revenue > 0 ? Math.round((t.net / t.revenue) * 100) + '% margin' : '—';
+    }
+
+    renderBreakdown(list, t.revenue);
+    renderEntries(list);
+
+    $('breakdownHint').textContent = monthLabel(cursor);
+  }
+
+  function renderBreakdown(list, totalRevenue) {
+    const container = $('breakdownList');
+    if (list.length === 0) {
+      container.innerHTML = '<div class="empty">No entries this month.</div>';
+      return;
+    }
+    const byService = {};
+    list.forEach(e => {
+      if (!byService[e.service]) byService[e.service] = { revenue: 0, expenses: 0, net: 0, count: 0 };
+      byService[e.service].revenue += e.revenue;
+      byService[e.service].expenses += e.expenses;
+      byService[e.service].net += (e.revenue - e.expenses);
+      byService[e.service].count += 1;
+    });
+    const rows = Object.entries(byService)
+      .sort((a, b) => b[1].revenue - a[1].revenue);
+    const max = Math.max(...rows.map(r => r[1].revenue), 1);
+
+    container.innerHTML = rows.map(([svc, data]) => {
+      const meta = SERVICE_META[svc] || SERVICE_META.OTHER;
+      const pct = totalRevenue > 0 ? Math.round((data.revenue / totalRevenue) * 100) : 0;
+      const barPct = (data.revenue / max) * 100;
+      return `
+        <div class="br-row">
+          <div class="br-tag"><span class="swatch" style="background:${meta.color}"></span>${meta.name}</div>
+          <div class="br-bar"><div style="width:${barPct}%;background:${meta.color}"></div></div>
+          <div class="br-amt">${fmtMoney(data.net)}</div>
+          <div class="br-pct">${pct}% · ${data.count}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderEntries(list) {
+    const body = $('entriesBody');
+    const empty = $('entriesEmpty');
+    if (list.length === 0) {
+      body.innerHTML = '';
+      empty.style.display = 'block';
+      return;
+    }
+    empty.style.display = 'none';
+    body.innerHTML = list.map(e => {
+      const meta = SERVICE_META[e.service] || SERVICE_META.OTHER;
+      const net = e.revenue - e.expenses;
+      const netClass = net > 0 ? 'pos' : (net < 0 ? 'neg' : '');
+      const dateFmt = new Date(e.date + 'T00:00:00').toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+      return `
+        <tr data-id="${e.id}">
+          <td>${dateFmt}</td>
+          <td><span class="service-pill"><span class="swatch" style="background:${meta.color}"></span>${meta.name}</span></td>
+          <td class="client hide-sm">${escapeHtml(e.client)}${e.notes ? ' <span style="opacity:0.6">· ' + escapeHtml(e.notes) + '</span>' : ''}</td>
+          <td class="num">${fmtMoney(e.revenue)}</td>
+          <td class="num hide-sm">${fmtMoney(e.expenses)}</td>
+          <td class="num net ${netClass}">${fmtMoney(net)}</td>
+          <td class="actions-cell"><button class="btn-icon danger" data-del="${e.id}" title="Delete">×</button></td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  $('entryForm').addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const revenue = parseFloat($('f-revenue').value) || 0;
+    const expenses = parseFloat($('f-expenses').value) || 0;
+    const entry = {
+      id: uid(),
+      date: $('f-date').value,
+      service: $('f-service').value,
+      client: $('f-client').value.trim(),
+      revenue,
+      expenses,
+      notes: $('f-notes').value.trim(),
+      createdAt: Date.now(),
     };
-    row.appendChild(b);
-  });
-}
-
-function render() {
-  const cards = getFiltered();
-  if (!cards.length) return;
-  if (idx >= cards.length) idx = cards.length - 1;
-  const c = cards[idx];
-  document.getElementById('qText').textContent = c.q;
-  document.getElementById('aText').textContent = c.a;
-  const knownCount = Object.values(known).filter(Boolean).length;
-  document.getElementById('scorePill').textContent = '💗 ' + knownCount + ' known so far';
-  document.getElementById('progress').textContent = 'Card ' + (idx+1) + ' of ' + cards.length + '  ·  ' + c.topic;
-  document.getElementById('prevBtn').disabled = idx === 0;
-  document.getElementById('nextBtn').disabled = idx === cards.length - 1;
-  isFlipped = false;
-  document.getElementById('cardInner').classList.remove('flipped');
-  document.getElementById('hint').textContent = 'Tap card to flip 💕';
-  document.getElementById('knowBtns').style.display = 'none';
-}
-
-function flipCard() {
-  isFlipped = !isFlipped;
-  document.getElementById('cardInner').classList.toggle('flipped', isFlipped);
-  if (isFlipped) {
-    document.getElementById('hint').textContent = 'How did you do? 🌸';
-    document.getElementById('knowBtns').style.display = 'flex';
-  } else {
-    document.getElementById('hint').textContent = 'Tap card to flip 💕';
-    document.getElementById('knowBtns').style.display = 'none';
-  }
-}
-
-function markCard(didKnow) {
-  const cards = getFiltered();
-  known[cards[idx].q] = didKnow;
-  if (idx < cards.length - 1) {
-    idx++;
+    if (!entry.date || !entry.client || revenue < 0) return;
+    entries.push(entry);
+    save();
+    cursor = startOfMonth(new Date(entry.date + 'T00:00:00'));
+    $('f-client').value = '';
+    $('f-revenue').value = '';
+    $('f-expenses').value = '0';
+    $('f-notes').value = '';
     render();
-  } else {
-    showDone();
-  }
-}
+    $('f-client').focus();
+  });
 
-function showDone() {
-  const cards = getFiltered();
-  const knownCount = cards.filter(c => known[c.q] === true).length;
-  document.getElementById('doneScreen').classList.add('show');
-  document.getElementById('mainArea').style.display = 'none';
-  document.getElementById('doneScore').textContent = 'You knew ' + knownCount + ' out of ' + cards.length + ' cards 💕';
-}
+  $('clearForm').addEventListener('click', () => {
+    $('entryForm').reset();
+    $('f-date').value = new Date().toISOString().slice(0, 10);
+    $('f-expenses').value = '0';
+  });
 
-function resetDeck() {
-  known = {};
-  idx = 0;
-  deck = [...data[currentSubject]];
-  document.getElementById('doneScreen').classList.remove('show');
-  document.getElementById('mainArea').style.display = 'flex';
+  $('entriesBody').addEventListener('click', (ev) => {
+    const btn = ev.target.closest('[data-del]');
+    if (!btn) return;
+    const id = btn.getAttribute('data-del');
+    const e = entries.find(x => x.id === id);
+    if (!e) return;
+    if (confirm(`Delete "${e.client}" (${fmtMoney(e.revenue)})?`)) {
+      entries = entries.filter(x => x.id !== id);
+      save();
+      render();
+    }
+  });
+
+  $('prevMonth').addEventListener('click', () => {
+    cursor = new Date(cursor.getFullYear(), cursor.getMonth() - 1, 1);
+    render();
+  });
+  $('nextMonth').addEventListener('click', () => {
+    cursor = new Date(cursor.getFullYear(), cursor.getMonth() + 1, 1);
+    render();
+  });
+
+  $('exportCsv').addEventListener('click', () => {
+    if (entries.length === 0) { alert('No entries to export.'); return; }
+    const header = ['Date', 'Service', 'Client', 'Revenue', 'Expenses', 'Net', 'Notes'];
+    const rows = [...entries]
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map(e => [
+        e.date,
+        e.service,
+        e.client,
+        e.revenue.toFixed(2),
+        e.expenses.toFixed(2),
+        (e.revenue - e.expenses).toFixed(2),
+        e.notes || '',
+      ]);
+    const csv = [header, ...rows]
+      .map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `mfg-tracker-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  $('resetAll').addEventListener('click', () => {
+    if (entries.length === 0) return;
+    if (confirm('Delete ALL entries? This cannot be undone.')) {
+      entries = [];
+      save();
+      render();
+    }
+  });
+
+  $('f-date').value = new Date().toISOString().slice(0, 10);
   render();
-}
-
-function navigate(dir) {
-  const cards = getFiltered();
-  idx = Math.max(0, Math.min(cards.length - 1, idx + dir));
-  render();
-}
-
-function shuffle() {
-  deck.sort(() => Math.random() - 0.5);
-  idx = 0;
-  render();
-}
-
-function spawnHearts() {
-  const container = document.getElementById('hearts');
-  const hearts = ['💕','💗','💖','🌸','✨','💓'];
-  for (let i = 0; i < 12; i++) {
-    const h = document.createElement('div');
-    h.className = 'fh';
-    h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
-    h.style.left = Math.random() * 100 + '%';
-    h.style.animationDuration = (8 + Math.random() * 10) + 's';
-    h.style.animationDelay = (Math.random() * 10) + 's';
-    h.style.fontSize = (12 + Math.random() * 10) + 'px';
-    container.appendChild(h);
-  }
-}
-
-spawnHearts();
-setSubject('chem');
+})();
 </script>
 </body>
 </html>
