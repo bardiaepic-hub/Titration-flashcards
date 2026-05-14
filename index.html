@@ -310,21 +310,31 @@
     border-radius: 8px;
     padding: 3px;
     background: var(--bg);
+    position: relative;
   }
-  .type-toggle button {
+  .type-toggle input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+  }
+  .type-toggle label {
     flex: 1;
-    background: transparent;
-    border: 0;
+    text-align: center;
     cursor: pointer;
-    padding: 7px 10px;
+    padding: 8px 10px;
     border-radius: 6px;
     font-size: 13px;
     font-weight: 600;
     color: var(--muted);
     font-family: inherit;
     transition: all 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
-  .type-toggle button.active {
+  .type-toggle input[type="radio"]:checked + label {
     background: var(--fg);
     color: white;
   }
@@ -422,9 +432,11 @@
       <form class="entry" id="entryForm" autocomplete="off">
         <div class="field col-4">
           <label>Type</label>
-          <div class="type-toggle" role="tablist">
-            <button type="button" data-type="oneoff" class="active">One-off</button>
-            <button type="button" data-type="monthly">Monthly</button>
+          <div class="type-toggle">
+            <input type="radio" name="entryType" id="type-oneoff" value="oneoff" checked>
+            <label for="type-oneoff">One-off</label>
+            <input type="radio" name="entryType" id="type-monthly" value="monthly">
+            <label for="type-monthly">Monthly</label>
           </div>
         </div>
         <div class="field col-4" id="dateField">
@@ -756,9 +768,8 @@
 
   function setType(t) {
     entryType = t;
-    document.querySelectorAll('.type-toggle button').forEach(b => {
-      b.classList.toggle('active', b.dataset.type === t);
-    });
+    const radio = document.querySelector('input[name="entryType"][value="' + t + '"]');
+    if (radio) radio.checked = true;
     const isMonthly = t === 'monthly';
     $('dateField').style.display = isMonthly ? 'none' : 'flex';
     $('startField').style.display = isMonthly ? 'flex' : 'none';
@@ -768,11 +779,8 @@
     $('revLabel').textContent = isMonthly ? 'Revenue / month' : 'Revenue';
     $('expLabel').textContent = isMonthly ? 'Expenses / month' : 'Expenses';
   }
-  document.querySelectorAll('.type-toggle button').forEach(b => {
-    b.addEventListener('click', (ev) => {
-      ev.preventDefault();
-      setType(b.dataset.type);
-    });
+  document.querySelectorAll('input[name="entryType"]').forEach(r => {
+    r.addEventListener('change', () => setType(r.value));
   });
 
   $('clearForm').addEventListener('click', () => {
